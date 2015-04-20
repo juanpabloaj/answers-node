@@ -1,0 +1,14 @@
+{
+  "name": "answers-node",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "juanpabloaj",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^2.2.4"
+  }
+}
