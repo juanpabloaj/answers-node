@@ -22,6 +22,7 @@ answersRef.limitToLast(1).on('value', function(snap){
         fs.writeFileSync('script.js', script_content);
 
         exec('node ./script.js', function(error, stdout, stderr){
+          stdout = stdout.replace(/\n$/, "");
 
           if ( error !== null ) {
             console.log('exec error: ', error);
