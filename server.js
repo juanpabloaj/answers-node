@@ -7,20 +7,24 @@ var questionsRef= new Firebase(firebaseUrl + 'questions');
 
 answersRef.limitToLast(1).on('value', function(snap){
   snap.forEach(function(ans){
-    if ( ans.val().verified === 0 ) {
+    if ( ans.val().state === 'waiting' ) {
       var question = ans.val().question;
 
       questionsRef.child(question).on('value', function(ques){
         var expected = ques.val().expected;
-        var evaluated = String(eval(ans.val().body));
+        var evaluated = String(eval(ans.val().code));
+
+        var state = 'failed';
         if ( expected === evaluated ) {
-          answersRef.child(ans.key()).update({
-            'verified':1
-          }, function(err){
-            if (err) console.log(err);
-            process.exit(0);
-          });
+          state = 'passed';
         }
+
+        answersRef.child(ans.key()).update({
+          'state':state
+        }, function(err){
+          if (err) console.log(err);
+          process.exit(0);
+        });
       });
 
     }
