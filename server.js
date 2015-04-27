@@ -3,50 +3,55 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 
 var firebaseUrl = process.env.FIREBASE_URL;
+var firebaseSecret = process.env.FIREBASE_SECRET;
 
 var answersRef= new Firebase(firebaseUrl + 'answers');
 var questionsRef= new Firebase(firebaseUrl + 'questions');
 
-answersRef.limitToLast(1).on('value', function(snap){
-  snap.forEach(function(ans){
-    if ( ans.val().state === 'waiting' ) {
-      console.log('Processing answers ' + ans.key());
-      var question = ans.val().question;
+answersRef.authWithCustomToken(firebaseSecret, function(err, result){
 
-      questionsRef.child(question).on('value', function(ques){
-        var expected = ques.val().expected;
-        var question_input = ques.val().input;
-        var code = ans.val().code;
+  answersRef.limitToLast(1).on('value', function(snap){
+    snap.forEach(function(ans){
+      if ( ans.val().state === 'waiting' ) {
+        console.log('Processing answers ' + ans.key());
+        var question = ans.val().question;
 
-        var script_content = question_input + ';\n' + code;
-        fs.writeFileSync('script.js', script_content);
+        questionsRef.child(question).on('value', function(ques){
+          var expected = ques.val().expected;
+          var question_input = ques.val().input;
+          var code = ans.val().code;
 
-        exec('node ./script.js', function(error, stdout, stderr){
-          stdout = stdout.replace(/\n$/, "");
+          var script_content = question_input + ';\n' + code;
+          fs.writeFileSync('script.js', script_content);
 
-          if ( error !== null ) {
-            console.log('exec error: ', error);
-          }
+          exec('node ./script.js', function(error, stdout, stderr){
+            stdout = stdout.replace(/\n$/, "");
 
-          var state = 'failed';
-          if ( expected === stdout ) {
-            state = 'passed';
-          }
+            if ( error !== null ) {
+              console.log('exec error: ', error);
+            }
 
-          answersRef.child(ans.key()).update({
-            'state':state,
-            'output': stdout,
-            'error': stderr
-          }, function(err){
-            if (err) console.log(err);
-            process.exit(0);
+            var state = 'failed';
+            if ( expected === stdout ) {
+              state = 'passed';
+            }
+
+            answersRef.child(ans.key()).update({
+              'state':state,
+              'output': stdout,
+              'error': stderr
+            }, function(err){
+              if (err) console.log(err);
+              process.exit(0);
+            });
           });
+
         });
 
-      });
-
-    }
+      }
+    });
   });
+
 });
 
 setTimeout(function(){
