@@ -2,6 +2,8 @@ var Firebase = require('firebase');
 var exec = require('child_process').exec;
 var fs = require('fs');
 
+var utils = require('./lib/utils');
+
 var firebaseUrl = process.env.FIREBASE_URL;
 var firebaseSecret = process.env.FIREBASE_SECRET;
 
@@ -21,10 +23,15 @@ answersRef.authWithCustomToken(firebaseSecret, function(err, result){
           var question_input = ques.val().input;
           var code = ans.val().code;
 
-          var script_content = question_input + ';\n' + code;
-          fs.writeFileSync('script.js', script_content);
+          var language = ques.val().language;
 
-          exec('node ./script.js', function(error, stdout, stderr){
+          var script_name = utils.gen_script_name(language);
+          var exec_cmd = utils.gen_exec_command(language);
+
+          var script_content = question_input + ';\n' + code;
+          fs.writeFileSync(script_name, script_content);
+
+          exec(exec_cmd, function(error, stdout, stderr){
             stdout = stdout.replace(/\n$/, "");
 
             if ( error !== null ) {
