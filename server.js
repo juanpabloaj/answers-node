@@ -28,7 +28,11 @@ answersRef.authWithCustomToken(firebaseSecret, function(err, result){
           var script_name = utils.gen_script_name(language);
           var exec_cmd = utils.gen_exec_command(language);
 
-          var script_content = question_input + ';\n' + code;
+          var script_content = code;
+          if ( question_input !== '' ){
+            script_content = question_input + ';\n' + code;
+          }
+
           fs.writeFileSync(script_name, script_content);
 
           exec(exec_cmd, function(error, stdout, stderr){
