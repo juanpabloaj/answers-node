@@ -6,8 +6,13 @@ describe('utils', function(){
     it('python2.7 return python2.7', function(){
       assert.equal('script.py', utils.gen_script_name('python2.7'));
     });
+
     it('javascript return node', function(){
       assert.equal('script.js', utils.gen_script_name('javascript'));
+    });
+
+    it('elixir return script.ex', function(){
+      assert.equal('script.ex', utils.gen_script_name('elixir'));
     });
   });
   describe('gen_exec_command', function(){
@@ -16,6 +21,10 @@ describe('utils', function(){
     });
     it('javascript return node script.js', function(){
       assert.equal('node script.js', utils.gen_exec_command('javascript'));
+    });
+
+    it('elixir return elixir script.ex', function(){
+      assert.equal('elixir script.ex', utils.gen_exec_command('elixir'));
     });
   });
 });
