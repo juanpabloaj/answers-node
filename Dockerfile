@@ -3,6 +3,9 @@ MAINTAINER JuanPabloAJ <jpabloaj@gmail.com>
 
 WORKDIR /tmp
 
+# install python3.4
+RUN apt-get update && apt-get install -y python3.4
+
 # "warning: the VM is running with native name encoding of latin1
 # which may cause Elixir to malfunction as it expects utf8."
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales \
